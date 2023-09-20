@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Practice2</string>
+    <string name="operar">Operar</string>
+    <string name="reiniciar">Reiniciar</string>
+    <string name="introducir">Introduce los números a operar</string>
+    <string name="resultado">Resultado</string>
+    <string name="sumar">Sumar</string>
+    <string name="restar">Restar</string>
+</resources>

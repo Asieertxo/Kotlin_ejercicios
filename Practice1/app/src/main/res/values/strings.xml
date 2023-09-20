@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Practice1</string>
+    <string name="comprobar">Comprobar</string>
+    <string name="reiniciar">Reiniciar</string>
+    <string name="insert">Introduce un número</string>
+    <string name="primo">Es un número primo</string>
+    <string name="noprimo">No es un número primo</string>
+</resources>
