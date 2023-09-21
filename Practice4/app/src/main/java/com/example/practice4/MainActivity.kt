@@ -12,9 +12,14 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        val imageButton = findViewById<ImageButton>(R.id.imagen)
         var texto = findViewById<TextView>(R.id.texto)
 
-        val changeText = { texto: TextView -> if (texto.text == "Llamar") texto.text = "Llamando..." else texto.text = "Llamar"}
-        findViewById<ImageButton>(R.id.imagen).setOnClickListener{changeText(texto)}
+        //val changeText = { texto: TextView -> if (texto.text == "Llamar") texto.text = "Llamando..." else texto.text = "Llamar"}
+        //findViewById<ImageButton>(R.id.imagen).setOnClickListener{changeText(texto)}
+
+        imageButton.setOnClickListener{
+            texto.text = "Llamando..."
+        }
     }
 }
