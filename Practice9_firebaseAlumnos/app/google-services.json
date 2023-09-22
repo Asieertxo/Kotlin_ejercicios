@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "4579999888",
+    "project_id": "prueba1-81738",
+    "storage_bucket": "prueba1-81738.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:4579999888:android:99d4e348492a1697b71815",
+        "android_client_info": {
+          "package_name": "com.example.practice9_firebasealumnos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCvjlGxY8hkkrlIfaN5FSIctLUg_T_hXXU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
