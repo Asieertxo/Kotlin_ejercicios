@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 
@@ -21,6 +22,8 @@ class MainActivity : AppCompatActivity() {
                 .addOnSuccessListener { result ->
                     for (document in result) {
                         Log.d("LEER", "${document.id} => ${document.data}")
+                        findViewById<TextView>(R.id.textView1).text = "Nombre: " + document.data.get("nombre").toString()
+                        findViewById<TextView>(R.id.textView2).text = "Ciudad: " + document.data.get("ciudad").toString()
                     }
                 }
                 .addOnFailureListener { exception ->
