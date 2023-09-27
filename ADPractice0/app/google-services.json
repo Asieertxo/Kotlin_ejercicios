@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "633766904672",
+    "project_id": "alumnos-6ec90",
+    "storage_bucket": "alumnos-6ec90.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:633766904672:android:a6cfe37b9fd58b5805d405",
+        "android_client_info": {
+          "package_name": "com.example.adpractice0"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD5LFdP5h3JZimAx8TDe5WVoVaa8tQ5inI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

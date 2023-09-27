@@ -1,14 +1,17 @@
 package com.example.adpractice2
 
-import androidx.appcompat.app.AppCompatActivity
+import android.R.attr.height
+import android.R.attr.width
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -54,27 +57,26 @@ class MainActivity : AppCompatActivity() {
 
         boton_consultaCodigo.setOnClickListener {
             db.collection("productos")
-                .whereEqualTo("id", texto_id.toString().toLong())
                 .get()
                 .addOnSuccessListener { result ->
-                    for (document in result) {
-                        productos = "Producto: " + document.data.get("descripcion").toString() + " Precio: " + document.data.get("precio").toString()
-                        lista.text = productos
+                    for (document in result){
+                        if(document.data.get("id") == texto_id.toString().toLong()) {
+                            productos = "Producto: " + document.data.get("descripcion").toString() + " ...... Precio: " + document.data.get("precio").toString()
+                            lista.text = productos
+                        }
                     }
-                }
-                .addOnFailureListener { exception ->
-                    Log.i("LEER", "Error getting documents.", exception)
                 }
         }
 
         boton_consultaDescripcion.setOnClickListener {
             db.collection("productos")
-                .whereEqualTo("descripcion", texto_descripcion.toString())
                 .get()
                 .addOnSuccessListener { result ->
                     for (document in result){
-                        productos = "Producto: " + document.data.get("descripcion").toString() + " Precio: " + document.data.get("precio").toString()
-                        lista.text = productos
+                        if(document.data.get("descripcion").toString().toLowerCase() == texto_descripcion.toString().toLowerCase()) {
+                            productos = "Producto: " + document.data.get("descripcion").toString() + " Precio: " + document.data.get("precio").toString()
+                            lista.text = productos
+                        }
                     }
                 }
         }
@@ -87,10 +89,10 @@ class MainActivity : AppCompatActivity() {
                 "precio" to texto_precio.toString().toInt()
             )
 
-            db.collection("productos")
-                .add(newProduct)
+            db.collection("productos").document("${texto_id.toString().toInt()}")
+                .set(newProduct)
                 .addOnCompleteListener {
-                    Toast.makeText(this, "producto_subido", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this, getString(R.string.producto_subido), Toast.LENGTH_LONG).show()
                     getProducts()
                 }
                 .addOnFailureListener {
@@ -100,26 +102,6 @@ class MainActivity : AppCompatActivity() {
         }
 
         boton_baja.setOnClickListener{
-            db.collection("productos")
-                .whereEqualTo("id", texto_id.toString().toInt())
-                .get()
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        db.collection("productos").document(document.id)
-                            .delete()
-                            .addOnCompleteListener {
-                                Toast.makeText(this, "Producto borrado", Toast.LENGTH_LONG).show()
-                                getProducts()
-                            }
-                            .addOnFailureListener {
-                                Toast.makeText(this, "Error al borrar", Toast.LENGTH_LONG).show()
-                            }
-                    }
-                }
-                .addOnFailureListener { exception ->
-                    Log.i("LEER", "Error getting documents.", exception)
-                }
-
             db.collection("productos").document("${texto_id.toString().toInt()}")
                 .delete()
                 .addOnCompleteListener {
@@ -138,25 +120,37 @@ class MainActivity : AppCompatActivity() {
                 "precio" to texto_precio.toString().toInt()
             )
 
-            db.collection("productos")
-                .whereEqualTo("id", texto_id.toString().toInt())
-                .get()
-                .addOnSuccessListener { result ->
-                    for (document in result) {
-                        db.collection("productos")
-                            .document(document.id)
-                                .update("descripcion", texto_descripcion.toString(), "precio", texto_precio.toString().toInt())
-                                .addOnCompleteListener {
-                                    Toast.makeText(this, "Producto actualizado", Toast.LENGTH_LONG).show()
-                                    getProducts()
-                                }
-                                .addOnFailureListener {
-                                    Toast.makeText(this, "Error al actualizar", Toast.LENGTH_LONG).show()
-                                }
-                    }
+            db.collection("productos").document("${texto_id.toString().toInt()}")
+                .update("descripcion", texto_descripcion.toString(),
+                    "precio", texto_precio.toString().toInt())
+                .addOnCompleteListener {
+                    Toast.makeText(this, "Producto actualizado", Toast.LENGTH_LONG).show()
+                    getProducts()
+                }
+                .addOnFailureListener {
+                    Toast.makeText(this, "Error al actualizar", Toast.LENGTH_LONG).show()
                 }
         }
-
-
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
