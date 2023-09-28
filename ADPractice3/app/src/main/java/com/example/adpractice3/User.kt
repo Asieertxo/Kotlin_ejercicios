@@ -18,12 +18,13 @@ class User : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user)
-        auth = Firebase.auth
-        var user = Firebase.auth.currentUser
-        var main = Intent(this, MainActivity::class.java)
-        Log.d("user", user.toString())
 
-        findViewById<TextView>(R.id.text_user).text = user?.displayName.toString()
+        val bundle = intent.extras
+        val user = bundle?.getString("user")
+        var main = Intent(this, MainActivity::class.java)
+        Log.d("USER", user.toString())
+
+        findViewById<TextView>(R.id.text_user).text = user.toString()
 
         findViewById<Button>(R.id.boton_logout).setOnClickListener{
             FirebaseAuth.getInstance().signOut();

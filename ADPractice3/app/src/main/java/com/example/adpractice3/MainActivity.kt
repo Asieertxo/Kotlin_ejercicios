@@ -20,15 +20,16 @@ class MainActivity : AppCompatActivity() {
     }
     public override fun onStart() {
         var login = Intent(this, Login::class.java)
-        var user = Intent(this, User::class.java)
+        var userPage = Intent(this, User::class.java)
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            Log.w("KO", "existe" + "${currentUser.email}")
-            startActivity(user)
+            Log.w("OK", "existe" + "${currentUser.email}")
+            userPage.putExtra("user", currentUser.email.toString())
+            startActivity(userPage)
         }else{
-            Log.w("OK", "no existe" + "${currentUser}")
+            Log.w("KO", "no existe" + "${currentUser}")
             startActivity(login)
         }
     }
