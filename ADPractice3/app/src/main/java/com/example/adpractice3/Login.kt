@@ -68,8 +68,8 @@ class Login : AppCompatActivity() {
         }
 
         boton_acceder.setOnClickListener {
-            val text_email = findViewById<EditText>(R.id.editText_name).text
-            val text_pass = findViewById<EditText>(R.id.editText_pass).text
+            val text_email = findViewById<TextInputEditText>(R.id.editText_name).text
+            val text_pass = findViewById<TextInputEditText>(R.id.editText_pass).text
             if(text_email != null && text_pass != null) {
                 auth.signInWithEmailAndPassword(text_email.toString(), text_pass.toString())
                     .addOnCompleteListener(this) { task ->
