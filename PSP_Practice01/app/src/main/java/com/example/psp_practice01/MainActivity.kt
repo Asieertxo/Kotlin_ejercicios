@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
 
 
         startStop.setOnClickListener(){
-            var totalTime = calcTotalTime(tempHour.toString().toInt(), tempMin.toString().toInt(), tempSeg.toString().toInt())
+            var totalTime = calcTotalTime(tempHour.text.toString().toInt(), tempMin.text.toString().toInt(), tempSeg.text.toString().toInt())
             if (startStop.text == "start"){
                 intent.putExtra("time", totalTime)
                 startService(intent)
