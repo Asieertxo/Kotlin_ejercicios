@@ -24,6 +24,8 @@ class MainActivity : AppCompatActivity() {
         lista.onItemClickListener = AdapterView.OnItemClickListener{ parent, view, position, id ->
             val texto = findViewById<TextView>(R.id.textView)
             texto.text =  poblacion[position]
+            val toast = Toast.makeText(this, poblacion[position], Toast.LENGTH_LONG)
+            toast.show()
         }
 
     }
