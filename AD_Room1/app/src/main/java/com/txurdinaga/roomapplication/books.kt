@@ -1,11 +1,18 @@
-package com.example.ad_room1
+package com.txurdinaga.roomapplication
 
 import androidx.annotation.NonNull
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "books")
+
+@Entity(tableName = "books",
+    foreignKeys = [
+        ForeignKey(entity = AuthorEntity::class, parentColumns = ["name"], childColumns = ["author"])
+    ]
+)
+
 data class BookEntity(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id")
@@ -18,7 +25,12 @@ data class BookEntity(
     @ColumnInfo(name = "author")
     @NonNull
     var author: String,
+
     @ColumnInfo(name = "pub_date")
     @NonNull
-    var pubDate: String,
-)
+    var pubDate: String
+
+) {
+
+
+}

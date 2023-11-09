@@ -1,4 +1,4 @@
-package com.example.ad_room1
+package com.txurdinaga.roomapplication
 
 import org.junit.Test
 

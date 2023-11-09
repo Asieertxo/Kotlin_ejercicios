@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_insert_all"
+        android:title="Guardar todo"/>
+    <item
+        android:id="@+id/save"
+        android:title="Guardar"/>
+    <item
+        android:id="@+id/action_delete"
+        android:title="Borrar"/>
+    <item
+        android:id="@+id/action_delete_all"
+        android:title="Borrar todo"/>
+    <item
+        android:id="@+id/action_update"
+        android:title="Actualizar"/>
+    <item
+        android:id="@+id/action_books_by_author"
+        android:title="Actualizar"/>
+    <item
+        android:id="@+id/action_all_titles"
+        android:title="Actualizar"/>
+    <item
+        android:id="@+id/action_insert_authors"
+        android:title="Insertar autores"
+        app:showAsAction="never" />
+
+    <item
+        android:id="@+id/action_get_authors_and_books"
+        android:title="Autores y sus libros"
+        app:showAsAction="never" />
+
+
+</menu>

@@ -1,4 +1,4 @@
-package com.example.ad_room1
+package com.txurdinaga.roomapplication
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -8,7 +8,6 @@ import androidx.room.Update
 
 @Dao
 interface BooksDao {
-
     @Insert
     fun insert(book: BookEntity)
 

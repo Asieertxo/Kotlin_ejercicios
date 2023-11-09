@@ -4,19 +4,20 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
-import androidx.appcompat.app.AppCompatActivity
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProvider
+import android.widget.ProgressBar
+import androidx.appcompat.app.AppCompatActivity
+
 
 class MainActivity : AppCompatActivity() {
+    var totalTime : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
 
         val startStop = findViewById<Button>(R.id.button)
         val tempHour = findViewById<EditText>(R.id.tempHour)
@@ -24,15 +25,22 @@ class MainActivity : AppCompatActivity() {
         val tempSeg = findViewById<EditText>(R.id.tempSeg)
         val intent = Intent(this, MyService::class.java)
 
+        //Poner las preferencias
+        val prefs : SharedPreferences = getSharedPreferences("time",Context.MODE_PRIVATE)
+        val segundosPrefs = prefs.getInt("segundos", 0)
+        val resultado = segundosAHorasMinutosSegundos(segundosPrefs.toString().toInt())
+        val (horas, minutos, segundos) = resultado
+        tempHour.setText(horas.toString())
+        tempMin.setText(minutos.toString())
+        tempSeg.setText(segundos.toString())
 
+        //BroadCast del servicio
         val temporizador = IntentFilter("broadcast_temporizador")
         registerReceiver(broadcastReceiver, temporizador)
-        val tempTerminado = IntentFilter("broadcast_temp_terminado")
-        registerReceiver(broadcastReceiver, tempTerminado)
 
         startStop.setOnClickListener(){
             if(tempHour.text.isNotEmpty()) {
-                var totalTime = calcTotalTime(
+                totalTime = calcTotalTime(
                     tempHour.text.toString().toInt(),
                     tempMin.text.toString().toInt(),
                     tempSeg.text.toString().toInt()
@@ -58,6 +66,9 @@ class MainActivity : AppCompatActivity() {
             val tempHour = findViewById<EditText>(R.id.tempHour)
             val tempMin = findViewById<EditText>(R.id.tempMin)
             val tempSeg = findViewById<EditText>(R.id.tempSeg)
+            val startStop = findViewById<Button>(R.id.button)
+            val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+
             if (intent?.action == "broadcast_temporizador") {
                 val segundosRestantes = intent.getStringExtra("resultado")
 
@@ -69,10 +80,18 @@ class MainActivity : AppCompatActivity() {
                 tempHour.isEnabled = false
                 tempMin.isEnabled = false
                 tempSeg.isEnabled = false
-            }else if(intent?.action == "broadcast_temp_terminado"){
-                tempHour.isEnabled = true
-                tempMin.isEnabled = true
-                tempSeg.isEnabled = true
+
+                //Barra de Progreso
+
+                progressBar.progress = ((segundosRestantes.toString().toInt() * 100) / totalTime).toInt()
+
+                //Cuando termine el temporizador que ponga las cosas como el principio
+                if(intent.getBooleanExtra("terminado", false)){
+                    tempHour.isEnabled = true
+                    tempMin.isEnabled = true
+                    tempSeg.isEnabled = true
+                    startStop.text = "start"
+                }
             }
         }
     }

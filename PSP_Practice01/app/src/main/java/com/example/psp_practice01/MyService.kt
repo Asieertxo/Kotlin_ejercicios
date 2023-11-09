@@ -1,7 +1,9 @@
 package com.example.psp_practice01
 
 import android.app.Service
+import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.media.MediaPlayer
 import android.os.Handler
 import android.os.IBinder
@@ -26,9 +28,15 @@ class MyService : Service() {
         var time = intent.getIntExtra("time", 0)
         scope.launch {
             while (time >= 0) {
-                Log.i("tag", time.toString())
                 val intent = Intent("broadcast_temporizador")
                 intent.putExtra("resultado", time.toString())
+                //preferencias
+                val editor : SharedPreferences = getSharedPreferences("time", Context.MODE_PRIVATE)
+                editor.edit().putInt("segundos", time).apply()
+
+                if(time <= 0){
+                    intent.putExtra("terminado", true)
+                }
                 sendBroadcast(intent)
                 time--
                 delay(1000)
@@ -36,8 +44,6 @@ class MyService : Service() {
             val mediaPlayer = MediaPlayer.create(applicationContext, R.raw.nanomusic)
             mediaPlayer.start()
         }
-        val terminado = Intent("broadcast_temp_terminado")
-        sendBroadcast(terminado)
         return START_STICKY
     }
 
