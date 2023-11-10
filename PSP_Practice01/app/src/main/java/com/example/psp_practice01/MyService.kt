@@ -29,7 +29,7 @@ class MyService : Service() {
         scope.launch {
             while (time >= 0) {
                 val intent = Intent("broadcast_temporizador")
-                intent.putExtra("resultado", time.toString())
+                intent.putExtra("resultado", time.toInt())
                 //preferencias
                 val editor : SharedPreferences = getSharedPreferences("time", Context.MODE_PRIVATE)
                 editor.edit().putInt("segundos", time).apply()

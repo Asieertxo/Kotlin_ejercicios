@@ -15,14 +15,17 @@ import androidx.appcompat.app.AppCompatActivity
 
 class MainActivity : AppCompatActivity() {
     var totalTime : Int = 0
+    var leftTime : Int = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val startStop = findViewById<Button>(R.id.button)
+        val btnStartStop = findViewById<Button>(R.id.btn_startStop)
+        val btnPause = findViewById<Button>(R.id.btn_pause)
         val tempHour = findViewById<EditText>(R.id.tempHour)
         val tempMin = findViewById<EditText>(R.id.tempMin)
         val tempSeg = findViewById<EditText>(R.id.tempSeg)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
         val intent = Intent(this, MyService::class.java)
 
         //Poner las preferencias
@@ -38,22 +41,47 @@ class MainActivity : AppCompatActivity() {
         val temporizador = IntentFilter("broadcast_temporizador")
         registerReceiver(broadcastReceiver, temporizador)
 
-        startStop.setOnClickListener(){
-            if(tempHour.text.isNotEmpty()) {
+        //boton de start-stop
+        btnStartStop.setOnClickListener(){
+            if(tempHour.text.isNotEmpty() && tempMin.text.isNotEmpty() && tempSeg.text.isNotEmpty()) {
                 totalTime = calcTotalTime(
                     tempHour.text.toString().toInt(),
                     tempMin.text.toString().toInt(),
                     tempSeg.text.toString().toInt()
                 )
-                if (startStop.text == "start") {
+                if (btnStartStop.text == "start") {
                     intent.putExtra("time", totalTime)
                     startService(intent)
-                    startStop.text = "stop"
+                    btnStartStop.text = "stop"
+                    progressBar.max = totalTime
                 } else {
                     stopService(intent)
-                    startStop.text = "start"
+                    tempHour.isEnabled = true
+                    tempMin.isEnabled = true
+                    tempSeg.isEnabled = true
+                    tempHour.setText("0")
+                    tempMin.setText("0")
+                    tempSeg.setText("0")
+                    btnStartStop.text = "start"
+                    progressBar.max = 100
+                    progressBar.progress = 100
                 }
             }
+        }
+
+        btnPause.setOnClickListener(){
+            if(btnPause.text == "pause"){
+                Log.i("tiempo", leftTime.toString())
+                stopService(intent)
+                btnPause.text = "continue"
+                Log.i("tiempo", leftTime.toString())
+            }else{
+                Log.i("tiempo", leftTime.toString())
+                intent.putExtra("time", leftTime)
+                startService(intent)
+                btnPause.text = "pause"
+            }
+
         }
     }
 
@@ -66,13 +94,13 @@ class MainActivity : AppCompatActivity() {
             val tempHour = findViewById<EditText>(R.id.tempHour)
             val tempMin = findViewById<EditText>(R.id.tempMin)
             val tempSeg = findViewById<EditText>(R.id.tempSeg)
-            val startStop = findViewById<Button>(R.id.button)
+            val startStop = findViewById<Button>(R.id.btn_startStop)
             val progressBar = findViewById<ProgressBar>(R.id.progressBar)
 
             if (intent?.action == "broadcast_temporizador") {
-                val segundosRestantes = intent.getStringExtra("resultado")
+                leftTime = intent.getIntExtra("resultado", 0)
 
-                val resultado = segundosAHorasMinutosSegundos(segundosRestantes.toString().toInt())
+                val resultado = segundosAHorasMinutosSegundos(leftTime)
                 val (horas, minutos, segundos) = resultado
                 tempHour.setText(horas.toString())
                 tempMin.setText(minutos.toString())
@@ -82,8 +110,7 @@ class MainActivity : AppCompatActivity() {
                 tempSeg.isEnabled = false
 
                 //Barra de Progreso
-
-                progressBar.progress = ((segundosRestantes.toString().toInt() * 100) / totalTime).toInt()
+                progressBar.progress = leftTime
 
                 //Cuando termine el temporizador que ponga las cosas como el principio
                 if(intent.getBooleanExtra("terminado", false)){
@@ -91,6 +118,8 @@ class MainActivity : AppCompatActivity() {
                     tempMin.isEnabled = true
                     tempSeg.isEnabled = true
                     startStop.text = "start"
+                    progressBar.max = 100
+                    progressBar.progress = 100
                 }
             }
         }
