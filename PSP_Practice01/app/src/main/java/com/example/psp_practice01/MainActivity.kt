@@ -6,7 +6,6 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.SharedPreferences
 import android.os.Bundle
-import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -56,7 +55,7 @@ class MainActivity : AppCompatActivity() {
                     progressBar.max = totalTime
                 } else {
                     stopService(intent)
-                    tempHour.isEnabled = true
+                    tempHour.isEnabled = trueT
                     tempMin.isEnabled = true
                     tempSeg.isEnabled = true
                     tempHour.setText("0")
@@ -71,12 +70,9 @@ class MainActivity : AppCompatActivity() {
 
         btnPause.setOnClickListener(){
             if(btnPause.text == "pause"){
-                Log.i("tiempo", leftTime.toString())
                 stopService(intent)
                 btnPause.text = "continue"
-                Log.i("tiempo", leftTime.toString())
             }else{
-                Log.i("tiempo", leftTime.toString())
                 intent.putExtra("time", leftTime)
                 startService(intent)
                 btnPause.text = "pause"
