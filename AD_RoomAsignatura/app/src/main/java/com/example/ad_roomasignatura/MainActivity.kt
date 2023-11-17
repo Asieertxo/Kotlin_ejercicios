@@ -3,12 +3,15 @@ package com.example.ad_roomasignatura
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.widget.AutoCompleteTextView
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
 import androidx.room.Room
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
+import android.content.Intent
+import android.widget.ArrayAdapter
 
 class MainActivity : AppCompatActivity() {
 
@@ -21,7 +24,7 @@ class MainActivity : AppCompatActivity() {
 
         val tv_asignaturas = findViewById<TextView>(R.id.tv_asignaturas)
         val et_asigName = findViewById<TextInputEditText>(R.id.et_asigName)
-        val et_asigTeacher = findViewById<TextInputEditText>(R.id.et_asigTeacher)
+        val et_asigTeacher = findViewById<AutoCompleteTextView>(R.id.et_asigTeacher)
         val til_asigName = findViewById<TextInputLayout>(R.id.til_asigName)
         val til_asigTeacher = findViewById<TextInputLayout>(R.id.til_asigTeacher)
         val btn_asigInsert = findViewById<Button>(R.id.btn_asigInsert)
@@ -50,6 +53,36 @@ class MainActivity : AppCompatActivity() {
 
         //mostramos los profesores
         showProfesores(database, tv_profesores)
+
+
+
+        val profesores = database.profesorDao.getAllProfesores()
+        val profesoresList: MutableList<String> = mutableListOf()
+        profesores.forEach { profesor ->
+            profesoresList.add(profesor.name)
+        }
+
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_dropdown_item_1line,
+            profesoresList.toList()
+        )
+
+        et_asigTeacher.setAdapter(adapter)
+        var selectedItem : String =""
+
+        et_asigTeacher.setOnItemClickListener { parent, _, position, _ ->
+            selectedItem = profesoresList.toList()[position]
+            // Realiza alguna acción con el elemento seleccionado
+            Toast.makeText(this, profesoresList[selectedItem].toString(), Toast.LENGTH_SHORT).show()
+
+        }
+
+
+
+
+
 
 
         //ASIGNATURA
