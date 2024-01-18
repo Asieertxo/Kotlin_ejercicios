@@ -1,5 +1,6 @@
 package com.example.ad_roomasignatura
 
+import android.database.sqlite.SQLiteException
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -10,12 +11,12 @@ import android.widget.Toast
 import androidx.room.Room
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import android.content.Intent
 import android.widget.ArrayAdapter
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var database: AppDatabase
+    var selectedTeacher : String =""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,29 +56,10 @@ class MainActivity : AppCompatActivity() {
         showProfesores(database, tv_profesores)
 
 
-
-        val profesores = database.profesorDao.getAllProfesores()
-        val profesoresList: MutableList<String> = mutableListOf()
-        profesores.forEach { profesor ->
-            profesoresList.add(profesor.name)
-        }
+        //Dropdown de profesores y gestion
+        setTeacherDropdown()
 
 
-        val adapter = ArrayAdapter(
-            this,
-            android.R.layout.simple_dropdown_item_1line,
-            profesoresList.toList()
-        )
-
-        et_asigTeacher.setAdapter(adapter)
-        var selectedItem : String =""
-
-        et_asigTeacher.setOnItemClickListener { parent, _, position, _ ->
-            selectedItem = profesoresList.toList()[position]
-            // Realiza alguna acción con el elemento seleccionado
-            Toast.makeText(this, profesoresList[selectedItem].toString(), Toast.LENGTH_SHORT).show()
-
-        }
 
 
 
@@ -89,23 +71,24 @@ class MainActivity : AppCompatActivity() {
 
         btn_asigInsert.setOnClickListener(){
             val newAsinName = et_asigName.text.toString()
-            val newAsinTeacher = et_asigTeacher.text.toString()
             til_asigName.error = null
             til_asigTeacher.error = null
 
             if (newAsinName.trim().isNotEmpty()) {
-                if (newAsinTeacher.trim().isNotEmpty()) {
+                var newAsignatura = AsignaturaEntity(name = newAsinName, teacher = selectedTeacher)
+                if(selectedTeacher == "" || selectedTeacher == "Sin Profesor"){
+                    newAsignatura = AsignaturaEntity(name = newAsinName, teacher = null)
+                }
 
-                    val newAsignatura = AsignaturaEntity(name = newAsinName, teacher = newAsinTeacher)
+                try {
                     database.asignaturaDao.insert(newAsignatura)
                     Toast.makeText(this, "Asignatura insertada", Toast.LENGTH_SHORT).show()
                     et_asigName.setText("")
                     et_asigTeacher.setText("")
                     showAsignaturas(database, tv_asignaturas)
-
-                }else{
-                    til_asigTeacher.error = "Rellena el campo"
-                    til_asigTeacher.requestFocus()
+                }catch (e: SQLiteException){
+                    Log.i("error", e.toString())
+                    Toast.makeText(this, "Puede que ya exista la asignatura", Toast.LENGTH_SHORT).show()
                 }
             }else{
                 til_asigName.error = "Rellena el campo"
@@ -134,25 +117,7 @@ class MainActivity : AppCompatActivity() {
             val asigName = et_asigName.text.toString()
             val newAsinTeacher = et_asigTeacher.text.toString()
 
-            if (asigName.trim().isNotEmpty()) {
-                if (newAsinTeacher.trim().isNotEmpty()) {
-
-                    val asignatura: List<AsignaturaEntity> = database.asignaturaDao.getAsignaturaByName(asigName)
-                    if (asignatura.size > 0) {
-                        asignatura.first().teacher = newAsinTeacher
-                        database.asignaturaDao.update(asignatura.first())
-                        Toast.makeText(this, "Profesor asignado", Toast.LENGTH_SHORT).show()
-                        showAsignaturas(database, tv_asignaturas)
-                    }
-
-                }else{
-                    til_asigTeacher.error = "Rellena el campo"
-                    til_asigTeacher.requestFocus()
-                }
-            }else{
-                til_asigName.error = "Rellena el campo"
-                til_asigName.requestFocus()
-            }
+            asignarProfe(asigName, newAsinTeacher)
         }
 
 
@@ -171,10 +136,17 @@ class MainActivity : AppCompatActivity() {
                 if (newTeachSurname.trim().isNotEmpty()) {
                     if (newTeachDate.trim().isNotEmpty()) {
 
-                        val newTeacher = ProfesorEntity(name = newTeachName, surname = newTeachSurname, date = newTeachDate)
-                        database.profesorDao.insert(newTeacher)
-                        Toast.makeText(this, "Profesor insertado", Toast.LENGTH_SHORT).show()
-                        showProfesores(database, tv_profesores)
+                        try {
+                            val newTeacher = ProfesorEntity(name = newTeachName, surname = newTeachSurname, date = newTeachDate)
+                            database.profesorDao.insert(newTeacher)
+                            Toast.makeText(this, "Profesor insertado", Toast.LENGTH_SHORT).show()
+                            showProfesores(database, tv_profesores)
+                            setTeacherDropdown()
+                        }catch (e: SQLiteException){
+                            Toast.makeText(this, "Puede que ya exista el profesor", Toast.LENGTH_SHORT).show()
+                        }
+
+
 
                     }else{
                         til_teachDate.error = "Rellena el campo"
@@ -194,17 +166,20 @@ class MainActivity : AppCompatActivity() {
             val techName = et_teachName.text.toString()
 
             if (techName.trim().isNotEmpty()) {
-                val asignatura: List<AsignaturaEntity> = database.asignaturaDao.getAsignaturaByTeacher(techName)
-                if (asignatura.size <= 0) {
-                    val profesor: List<ProfesorEntity> = database.profesorDao.getProfesorByName(techName)
-                    if (profesor.size > 0) {
-                        database.profesorDao.delete(profesor.first())
-                        Toast.makeText(this, "Profesor borrado", Toast.LENGTH_SHORT).show()
-                        showProfesores(database, tv_profesores)
+                //comprobamos si hay asignaturas con este profesor y lo desasignamos
+                val asignaturas: List<AsignaturaEntity> = database.asignaturaDao.getAsignaturaByTeacher(techName)
+                if (asignaturas.size > 0) {
+                    asignaturas.forEach { asignatura ->
+                        asignarProfe(asignatura.name, "")
                     }
-                }else {
-                    til_teachName.error = "Hay asignaturas con este profesor"
-                    til_teachName.requestFocus()
+                }
+
+                val profesor: List<ProfesorEntity> = database.profesorDao.getProfesorByName(techName)
+                if (profesor.size > 0) {
+                    database.profesorDao.delete(profesor.first())
+                    Toast.makeText(this, "Profesor borrado", Toast.LENGTH_SHORT).show()
+                    showProfesores(database, tv_profesores)
+                    setTeacherDropdown()
                 }
             }else{
                 til_teachName.error = "Rellena el campo"
@@ -217,9 +192,14 @@ class MainActivity : AppCompatActivity() {
 
     fun showAsignaturas(database: AppDatabase, tv_asignaturas: TextView) {
         tv_asignaturas.text = ""
-        val asignaturas = this.database.asignaturaDao.getAllAsignaturas()
+        val asignaturas = this.database.asignaturaProfesorDao.getAllAsignaturasProfesor()
+        Log.i("kkk", asignaturas.toString())
         asignaturas.forEach { asignatura ->
-            tv_asignaturas.append("${asignatura.name} -> Profesor: ${asignatura.teacher}\n")
+            if(asignatura.profesor_name.isNullOrEmpty()){
+                tv_asignaturas.append("${asignatura.asignatura_name} -> Profesor: Sin Profesor\n")
+            }else {
+                tv_asignaturas.append("${asignatura.asignatura_name} -> Profesor: ${asignatura.profesor_name} ${asignatura.profesor_surname}\n")
+            }
         }
     }
 
@@ -228,6 +208,52 @@ class MainActivity : AppCompatActivity() {
         val profesores = database.profesorDao.getAllProfesores()
         profesores.forEach { profesor ->
             tv_profesores.append("${profesor.name} ${profesor.surname} -> Fecha: ${profesor.date}\n")
+        }
+    }
+
+    fun asignarProfe(asigName: String, newAsinTeacher: String) {
+        val tv_asignaturas = findViewById<TextView>(R.id.tv_asignaturas)
+        val til_asigName = findViewById<TextInputLayout>(R.id.til_asigName)
+        val til_asigTeacher = findViewById<TextInputLayout>(R.id.til_asigTeacher)
+
+        if (asigName.trim().isNotEmpty()) {
+            var asignatura: List<AsignaturaEntity> = database.asignaturaDao.getAsignaturaByName(asigName)
+
+            if (asignatura.size > 0) {
+                if(newAsinTeacher == "" || newAsinTeacher == "Sin Profesor"){
+                    asignatura.first().teacher = null
+                }else {
+                    asignatura.first().teacher = newAsinTeacher
+                }
+                database.asignaturaDao.update(asignatura.first())
+                Toast.makeText(this, "Profesor asignado", Toast.LENGTH_SHORT).show()
+                showAsignaturas(database, tv_asignaturas)
+            }
+        }else{
+            til_asigName.error = "Rellena el campo"
+            til_asigName.requestFocus()
+        }
+    }
+
+    fun setTeacherDropdown(){
+        val et_asigTeacher = findViewById<AutoCompleteTextView>(R.id.et_asigTeacher)
+        val profesores = database.profesorDao.getAllProfesores()
+        val profesoresList: MutableList<String> = mutableListOf()
+        profesoresList.add("Sin Profesor")
+        profesores.forEach { profesor ->
+            profesoresList.add(profesor.name)
+        }
+
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_dropdown_item_1line,
+            profesoresList.toList()
+        )
+
+        et_asigTeacher.setAdapter(adapter)
+
+        et_asigTeacher.setOnItemClickListener { parent, _, position, _ ->
+            selectedTeacher = profesoresList.toList()[position]
         }
     }
 }

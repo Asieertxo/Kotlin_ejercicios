@@ -26,3 +26,4 @@ interface AsignaturaDao {
     @Delete
     fun delete(asignatura: AsignaturaEntity)
 }
+

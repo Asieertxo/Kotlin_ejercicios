@@ -8,6 +8,7 @@ import androidx.room.RoomDatabase
 abstract class AppDatabase: RoomDatabase() {
     abstract val asignaturaDao: AsignaturaDao
     abstract val profesorDao: ProfesorDao
+    abstract val asignaturaProfesorDao: AsignaturaProfesorDao
 
     companion object {
         const val DATABASE_NAME = "db-adibide"
